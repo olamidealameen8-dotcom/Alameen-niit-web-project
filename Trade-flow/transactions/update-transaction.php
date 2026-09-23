@@ -2,11 +2,11 @@
 
 <?php
 // DECLARATION OF VARIABLES
-$transactionsId = trim($_POST['transactionsId'] ?? $_POST['transactionId'] ?? '');
-$customerId = trim($_POST['customerId'] ?? '');
-$price = trim($_POST['price'] ?? '');
-$paymentMethodId = trim($_POST['paymentMethodId'] ?? '');
-$statusId = trim($_POST['statusId'] ?? '');
+$transactionsId = trim($_POST['transactionsId']);
+$customerId = trim($_POST['customerId']);
+$price = trim($_POST['price']);
+$paymentMethodId = trim($_POST['paymentMethodId']);
+$statusId = trim($_POST['statusId']);
 
 if ($transactionsId == '') {
     $response = [

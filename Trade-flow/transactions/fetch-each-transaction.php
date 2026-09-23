@@ -2,7 +2,7 @@
 
 <?php
 
-$transactionsId = trim($_POST['transactionsId'] ?? $_POST['transactionId'] ?? '');
+$transactionsId = trim($_POST['transactionsId']);
 
 if ($transactionsId == '') {
     $response = [

@@ -2,7 +2,7 @@
 
 <?php
 // DECLARATION OF VARIABLE
-$searchContent = trim($_POST['searchContent'] ?? '');
+$searchContent = trim($_POST['searchContent']);
 
 if ($searchContent == '') {
     $response = [
