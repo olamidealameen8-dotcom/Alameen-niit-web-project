@@ -5,9 +5,9 @@
 $firstName = trim($_POST['firstName']);
 $lastName = trim($_POST['lastName']);
 $emailAddress = trim($_POST['emailAddress']);
-$password = trim($_POST['password']);
+$password = $_POST['password'];
 $roleId = trim($_POST['roleId']);
-$statusId = '1';
+$statusId = trim($_POST['statusId']);
 
 if ($firstName == '') {
     $response = [
@@ -57,6 +57,15 @@ if ($roleId == '') {
     goto end;
 }
 
+
+if ($statusId == '') {
+    $response = [
+        'success' => false,
+        'message' => "STATUS ID IS REQUIRED, Kindly fill in the last name to continue"
+    ];
+    goto end;
+}
+
 $emailCheck = mysqli_query($conn, "SELECT * FROM customer_tab WHERE email_address = '$emailAddress'") or die(mysqli_error($conn));
 if (mysqli_num_rows($emailCheck) > 0) {
     $response = [
@@ -94,8 +103,9 @@ $response = [
         'statusId' => $customerData['status_id'],
         'statusName' => $customerData['status_name'],
         'roleId' => $customerData['role_id'],
+        'statusId' => $customerData['status_id'],
         'roleName' => $customerData['role_name'],
-        'lastLoginDate' => $customerData['last_login_date'] ?? null,
+        'lastLoginDate' => $customerData['last_login_date'] ,
         'createdAt' => $customerData['created_at'],
         'updatedAt' => $customerData['updated_at']
     ]

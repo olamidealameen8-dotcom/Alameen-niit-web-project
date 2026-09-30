@@ -6,10 +6,10 @@ $firstName = trim($_POST['firstName']);
 $lastName = trim($_POST['lastName']);
 $emailAddress = trim($_POST['emailAddress']);
 $phoneNumber = trim($_POST['phoneNumber']);
-$address = trim($_POST['address']);
-$password = trim($_POST['password']);
+$address = $_POST['address'];
+$password = $_POST['password'];
 $roleId = trim($_POST['roleId']);
-$statusId = 'A';
+$statusId = trim($_POST['statusId']);
 
 if ($firstName == '') {
     $response = [
@@ -82,6 +82,18 @@ if ($roleId == '') {
     goto end;
 }
 
+
+if ($statusId == '') {
+    $response = [
+        'success' => false,
+        'message' => "STATUS ID IS REQUIRED, Kindly fill in the status ID to continue"
+    ];
+    goto end;
+}
+
+
+
+
 $emailcheck = mysqli_query($conn, "SELECT * FROM staff_tab WHERE email_address = '$emailAddress'") or die(mysqli_error($conn));
 if (mysqli_num_rows($emailcheck) > 0) {
     $response = [
@@ -116,7 +128,6 @@ $response = [
         'password' => $staffData['password'],
         'roleId' => $staffData['role_id'],
         'roleName' => $staffData['role_name'],
-        'lastLoginDate' => $staffData['last_login_date'] ?? $staffData['last_log_in_date'] ?? $staffData['last_login'] ?? null,
         'createdAt' => $staffData['created_at'],
         'updatedAt' => $staffData['updated_at']
     ]

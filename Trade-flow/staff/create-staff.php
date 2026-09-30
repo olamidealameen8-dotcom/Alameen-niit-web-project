@@ -6,8 +6,8 @@ $firstName = trim($_POST['firstName']);
 $lastName = trim($_POST['lastName']);
 $emailAddress = trim($_POST['emailAddress']);
 $phoneNumber = trim($_POST['phoneNumber']);
-$address = trim($_POST['address']);
-$password = trim($_POST['password']);
+$address = $_POST['address'];
+$password = $_POST['password'];
 $roleId = trim($_POST['roleId']);
 $statusId = trim($_POST['statusId']);
 
@@ -30,7 +30,7 @@ if ($lastName == '') {
 if ($emailAddress == '') {
     $response = [
         'success' => false,
-        'message' => "EMAIL ADDRESS NAME IS REQUIRED, Kindly fill in the email address to continue"
+        'message' => "EMAIL ADDRESS IS REQUIRED, Kindly fill in the email address to continue"
     ];
     goto end;
 }
@@ -52,8 +52,6 @@ if ($phoneNumber == '') {
     goto end;
 }
 
-
-
 if ($password == '') {
     $response = [
         'success' => false,
@@ -61,8 +59,6 @@ if ($password == '') {
     ];
     goto end;
 }
-
-
 
 if ($address == '') {
     $response = [
@@ -72,8 +68,6 @@ if ($address == '') {
     goto end;
 }
 
-
-
 if ($roleId == '') {
     $response = [
         'success' => false,
@@ -82,18 +76,8 @@ if ($roleId == '') {
     goto end;
 }
 
-
-if ($statusId == '') {
-    $response = [
-        'success' => false,
-        'message' => "STATUS ID IS REQUIRED, Kindly fill in the status ID to continue"
-    ];
-    goto end;
-}
-
-
-$emailcheck = mysqli_query($conn, "SELECT * FROM staff_tab WHERE email_address = '$emailAddress'") or die(mysqli_error($conn));
-if (mysqli_num_rows($emailcheck) > 0) {
+$emailCheck = mysqli_query($conn, "SELECT * FROM staff_tab WHERE email_address = '$emailAddress'") or die(mysqli_error($conn));
+if (mysqli_num_rows($emailCheck) > 0) {
     $response = [
         "success" => false,
         "message" => "EMAIL ADDRESS ALREADY EXIST kindly proceed to sign in or forget password"
@@ -105,11 +89,11 @@ $staffId = 'STAFF' . date("Ymdhis");
 $hashPassword = md5($password);
 
 mysqli_query($conn, "INSERT INTO `staff_tab`
-    ( `staff_id`, `first_name`, `last_name`, `email_address`, `phone_number`, `address`, `status_id`,  `password`, `role_id`, `created_at`, `updated_at`) VALUES
-    ('$staffId', '$firstName', '$lastName', '$emailAddress', '$phoneNumber', '$address', '$statusId',  '$hashPassword', '$roleId', NOW(), NOW())") or die(mysqli_error($conn));
+    (`staff_id`, `first_name`, `last_name`, `email_address`, `phone_number`, `address`, `status_id`, `password`, `role_id`, `created_at`, `updated_at`) VALUES
+    ('$staffId', '$firstName', '$lastName', '$emailAddress', '$phoneNumber', '$address', '$statusId', '$hashPassword', '$roleId', NOW(), NOW())") or die(mysqli_error($conn));
 
-$createStaffQuery = mysqli_query($conn, "SELECT staff_tab.*, role_tab.role_name, status_tab.status_name FROM staff_tab, role_tab, status_tab WHERE staff_tab.role_id = role_tab.role_id AND staff_tab.status_id = status_tab.status_id AND staff_tab.email_address = '$emailAddress'") or die(mysqli_error($conn));
-$staffData = mysqli_fetch_assoc($createStaffQuery);
+$fetchStaffQuery = mysqli_query($conn, "SELECT staff_tab.*, role_tab.role_name, status_tab.status_name FROM staff_tab, role_tab, status_tab WHERE staff_tab.role_id = role_tab.role_id AND staff_tab.status_id = status_tab.status_id AND staff_tab.staff_id = '$staffId'") or die(mysqli_error($conn));
+$staffData = mysqli_fetch_assoc($fetchStaffQuery);
 
 $response = [
     'success' => true,
@@ -126,7 +110,6 @@ $response = [
         'password' => $staffData['password'],
         'roleId' => $staffData['role_id'],
         'roleName' => $staffData['role_name'],
-        'lastLoginDate' => $staffData['last_login_date'],
         'createdAt' => $staffData['created_at'],
         'updatedAt' => $staffData['updated_at']
     ]

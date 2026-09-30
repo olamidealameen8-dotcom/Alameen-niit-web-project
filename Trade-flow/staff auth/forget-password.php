@@ -15,7 +15,7 @@ if ($emailAddress == '') {
 
 if (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
     $response = [
-        'response' => 102,
+        'response' => 102,                                 
         'success' => false,
         'message' => "INVALID EMAIL ADDRESS! Enter a valid email address and try again",
     ];

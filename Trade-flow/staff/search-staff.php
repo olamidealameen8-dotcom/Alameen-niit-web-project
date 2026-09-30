@@ -24,6 +24,8 @@ if (mysqli_num_rows($searchStaffQuery) == 0) {
 
 $fetchData = mysqli_fetch_all($searchStaffQuery, MYSQLI_ASSOC);
 
+
+
 $response = [
     'success' => true,
     'message' => "STAFF SEARCH SUCCESFULLY",

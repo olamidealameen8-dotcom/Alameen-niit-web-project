@@ -4,8 +4,8 @@
 // Declaration Of Variable
 $customerId = trim($_POST['customerId']);
 $resetOtp = trim($_POST['resetOtp']);
-$password = trim($_POST['password']);
-$confirmPassword = trim($_POST['confirmPassword']);
+$password = $_POST['password'];
+$confirmPassword = $_POST['confirmPassword'];
 
 if ($customerId == '') {
     $response = [

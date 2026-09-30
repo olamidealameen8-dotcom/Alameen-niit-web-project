@@ -7,7 +7,7 @@ $staffId = trim($_POST['staffId']);
 if ($staffId == '') {
     $response = [
         'success' => false,
-        'message' => 'STAFF ID REQUIRED'
+        'message' => 'STAFF ID IS REQUIRED'
     ];
     goto end;
 }

@@ -3,7 +3,7 @@
 <?php
 // DECLARATION OF VARIABLES
 $emailAddress = trim($_POST['emailAddress']);
-$password = trim($_POST['password']);
+$password = $_POST['password'];
 
 if ($emailAddress == '') {
     $response = [

@@ -4,8 +4,8 @@
 // Decleration Of Variable
 $staffId = trim($_POST['staffId']);
 $resetOtp = trim($_POST['resetOtp']);
-$password = trim($_POST['password']);
-$confirmPassword = trim($_POST['confirmPassword']);
+$password = $_POST['password'];
+$confirmPassword = $_POST['confirmPassword'];
 
 
 if ($staffId == '') {
