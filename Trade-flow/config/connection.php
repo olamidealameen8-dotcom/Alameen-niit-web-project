@@ -10,8 +10,17 @@ header('Content-Type: application/json; charset=UTF-8');
 $_HOST_NAME = "localhost";  
 $_DB_USERNAME ="root";
 $_DB_PASSWORD ="";
-
 $conn = mysqli_connect($_HOST_NAME, $_DB_USERNAME, $_DB_PASSWORD)or die("Unable to connect to MySQL1");
 mysqli_select_db($conn,"trade_flow_db");
+
+////////////for online connect  
+// $_HOST_NAME = "102.68.98.184";  
+// $_DB_USERNAME ="niitwebd_tradeflow";
+// $_DB_PASSWORD ="a6TpTR2ScDgPgDjsCnTE";
+
+// $conn = mysqli_connect($_HOST_NAME, $_DB_USERNAME, $_DB_PASSWORD)or die("Unable to connect to MySQL1");
+// mysqli_select_db($conn,"niitwebd_tradeflow_db");
+
+    
 /////////////////////////////////////////////////////////////////
 ?>

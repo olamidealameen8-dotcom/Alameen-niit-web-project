@@ -12,7 +12,7 @@ if ($transactionsId == '') {
     goto end;
 }
 
-$checkTransactionQuery = mysqli_query($conn, "SELECT * FROM transactions_tab WHERE transactions_id = '$transactionsId'") or die(mysqli_error($conn));
+$checkTransactionQuery = mysqli_query($conn, "SELECT * FROM transaction_tab WHERE transactions_id = '$transactionsId'") or die(mysqli_error($conn));
 if (mysqli_num_rows($checkTransactionQuery) == 0) {
     $response = [
         'success' => false,
@@ -21,7 +21,7 @@ if (mysqli_num_rows($checkTransactionQuery) == 0) {
     goto end;
 }
 
-mysqli_query($conn, "DELETE FROM transactions_tab WHERE transactions_id = '$transactionsId'") or die(mysqli_error($conn));
+mysqli_query($conn, "DELETE FROM transaction_tab WHERE transactions_id = '$transactionsId'") or die(mysqli_error($conn));
 
 $response = [
     'success' => true,
