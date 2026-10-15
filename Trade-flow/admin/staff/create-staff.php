@@ -2,14 +2,24 @@
 
 <?php
 // DECLARATION OF VARIABLES
+$titleId = trim($_POST['titleId']);
 $firstName = trim($_POST['firstName']);
 $lastName = trim($_POST['lastName']);
 $emailAddress = trim($_POST['emailAddress']);
 $phoneNumber = trim($_POST['phoneNumber']);
-$address = $_POST['address'];
-$password = $_POST['password'];
+$address = trim($_POST['address']);
 $roleId = trim($_POST['roleId']);
 $statusId = trim($_POST['statusId']);
+
+
+if ($titleId == '') {
+    $response = [
+        'success' => false,
+        'message' => "TITLE ID IS REQUIRED, Kindly fill in the title ID to continue"
+    ];
+    goto end;
+}
+
 
 if ($firstName == '') {
     $response = [
@@ -19,6 +29,7 @@ if ($firstName == '') {
     goto end;
 }
 
+
 if ($lastName == '') {
     $response = [
         'success' => false,
@@ -26,6 +37,7 @@ if ($lastName == '') {
     ];
     goto end;
 }
+
 
 if ($emailAddress == '') {
     $response = [
@@ -37,9 +49,8 @@ if ($emailAddress == '') {
 
 if (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
     $response = [
-        'response' => 102,
         'success' => false,
-        'message' => "INVALID EMAIL ADDRESS! Enter a valid email address and try again",
+        'message' => "INVALID EMAIL ADDRESS! Enter a valid email address and try again"
     ];
     goto end;
 }
@@ -52,13 +63,6 @@ if ($phoneNumber == '') {
     goto end;
 }
 
-if ($password == '') {
-    $response = [
-        'success' => false,
-        'message' => "PASSWORD IS REQUIRED, Kindly fill in the password to continue"
-    ];
-    goto end;
-}
 
 if ($address == '') {
     $response = [
@@ -68,6 +72,7 @@ if ($address == '') {
     goto end;
 }
 
+
 if ($roleId == '') {
     $response = [
         'success' => false,
@@ -76,7 +81,18 @@ if ($roleId == '') {
     goto end;
 }
 
-$emailCheck = mysqli_query($conn, "SELECT * FROM staff_tab WHERE email_address = '$emailAddress'") or die(mysqli_error($conn));
+
+if ($statusId == '') {
+    $response = [
+        'success' => false,
+        'message' => "STATUS ID IS REQUIRED, Kindly fill in the status ID to continue"
+    ];
+    goto end;
+}
+
+
+
+$emailCheck = mysqli_query($conn, "SELECT * FROM staff_tab WHERE email_address = '$emailAddress' LIMIT 1") or die(mysqli_error($conn));
 if (mysqli_num_rows($emailCheck) > 0) {
     $response = [
         "success" => false,
@@ -85,21 +101,35 @@ if (mysqli_num_rows($emailCheck) > 0) {
     goto end;
 }
 
+
 $staffId = 'STAFF' . date("Ymdhis");
-$hashPassword = md5($password);
 
 mysqli_query($conn, "INSERT INTO `staff_tab`
-    (`staff_id`, `first_name`, `last_name`, `email_address`, `phone_number`, `address`, `status_id`, `password`, `role_id`, `created_at`, `updated_at`) VALUES
-    ('$staffId', '$firstName', '$lastName', '$emailAddress', '$phoneNumber', '$address', '$statusId', '$hashPassword', '$roleId', NOW(), NOW())") or die(mysqli_error($conn));
+    (`staff_id`, `title_id`, `first_name`, `last_name`, `email_address`, `phone_number`, `address`, `status_id`, `role_id`, `created_at`, `updated_at`) VALUES
+    ('$staffId', '$titleId', '$firstName', '$lastName', '$emailAddress', '$phoneNumber', '$address', '$statusId', '$roleId', NOW(), NOW())") or die(mysqli_error($conn));
 
-$fetchStaffQuery = mysqli_query($conn, "SELECT staff_tab.*, role_tab.role_name, status_tab.status_name FROM staff_tab, role_tab, status_tab WHERE staff_tab.role_id = role_tab.role_id AND staff_tab.status_id = status_tab.status_id AND staff_tab.staff_id = '$staffId'") or die(mysqli_error($conn));
+$fetchStaffQuery = mysqli_query($conn, "SELECT staff_tab.*, title_tab.title_name, role_tab.role_name, status_tab.status_name FROM staff_tab, title_tab, role_tab, status_tab 
+WHERE staff_tab.title_id = title_tab.title_id AND staff_tab.role_id = role_tab.role_id AND staff_tab.status_id = status_tab.status_id 
+AND staff_tab.email_address = '$emailAddress'") or die(mysqli_error($conn));
+
+
 $staffData = mysqli_fetch_assoc($fetchStaffQuery);
+
+if (!$staffData) {
+    $response = [
+        'success' => false,
+        'message' => "STAFF CREATED BUT UNABLE TO RETRIEVE DETAILS"
+    ];
+    goto end;
+}
 
 $response = [
     'success' => true,
     'message' => "STAFF CREATED SUCCESSFUL",
     'data' => [
         'staffId' => $staffData['staff_id'],
+        'titleId' => $staffData['title_id'],
+        'titleName' => $staffData['title_name'],
         'firstName' => $staffData['first_name'],
         'lastName' => $staffData['last_name'],
         'emailAddress' => $staffData['email_address'],
@@ -107,7 +137,6 @@ $response = [
         'address' => $staffData['address'],
         'statusId' => $staffData['status_id'],
         'statusName' => $staffData['status_name'],
-        'password' => $staffData['password'],
         'roleId' => $staffData['role_id'],
         'roleName' => $staffData['role_name'],
         'createdAt' => $staffData['created_at'],

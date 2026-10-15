@@ -2,12 +2,23 @@
 
 <?php
 // DECLARATION OF VARIABLES
+$titleId = trim($_POST['titleId']);
 $firstName = trim($_POST['firstName']);
 $lastName = trim($_POST['lastName']);
 $emailAddress = trim($_POST['emailAddress']);
+$phoneNumber = trim($_POST['phoneNumber']);
+$address = $_POST['address'];
 $password = $_POST['password'];
 $roleId = trim($_POST['roleId']);
 $statusId = trim($_POST['statusId']);
+
+if ($titleId == '') {
+    $response = [
+        'success' => false,
+        'message' => "TITLE ID IS REQUIRED, Kindly fill in the title ID to continue"
+    ];
+    goto end;
+}
 
 if ($firstName == '') {
     $response = [
@@ -41,6 +52,22 @@ if (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
     goto end;
 }
 
+if ($phoneNumber == '') {
+    $response = [
+        'success' => false,
+        'message' => "PHONE NUMBER IS REQUIRED, Kindly fill in the phone number to continue"
+    ];
+    goto end;
+}
+
+if ($address == '') {
+    $response = [
+        'success' => false,
+        'message' => "ADDRESS IS REQUIRED, Kindly fill in the address to continue"
+    ];
+    goto end;
+}
+
 if ($password == '') {
     $response = [
         'success' => false,
@@ -57,11 +84,19 @@ if ($roleId == '') {
     goto end;
 }
 
-
 if ($statusId == '') {
     $response = [
         'success' => false,
-        'message' => "STATUS ID IS REQUIRED, Kindly fill in the last name to continue"
+        'message' => "STATUS ID IS REQUIRED, Kindly fill in the status ID to continue"
+    ];
+    goto end;
+}
+
+$titleCheck = mysqli_query($conn, "SELECT * FROM title_tab WHERE title_id = '$titleId'") or die(mysqli_error($conn));
+if (mysqli_num_rows($titleCheck) == 0) {
+    $response = [
+        'success' => false,
+        'message' => "INVALID TITLE ID! Selected title ID does not exist in title_tab"
     ];
     goto end;
 }
@@ -84,12 +119,23 @@ if (mysqli_num_rows($roleCheck) == 0) {
     goto end;
 }
 
+$statusCheck = mysqli_query($conn, "SELECT * FROM status_tab WHERE status_id = '$statusId'") or die(mysqli_error($conn));
+if (mysqli_num_rows($statusCheck) == 0) {
+    $response = [
+        'success' => false,
+        'message' => "INVALID STATUS ID! Selected status does not exist"
+    ];
+    goto end;
+}
+
 $customerId = 'CUST' . date("YmdHis");
 $hashPassword = md5($password);
 
-mysqli_query($conn, "INSERT INTO `customer_tab` (`customer_id`, `first_name`, `last_name`, `email_address`, `password`, `status_id`, `role_id`, `created_at`, `updated_at`) VALUES ('$customerId', '$firstName', '$lastName', '$emailAddress', '$hashPassword', '$statusId', '$roleId', NOW(), NOW())") or die(mysqli_error($conn));
+mysqli_query($conn, "INSERT INTO `customer_tab` 
+    (`customer_id`, `title_id`, `first_name`, `last_name`, `email_address`, `phone_number`, `address`, `password`, `status_id`, `role_id`, `created_at`, `updated_at`) VALUES 
+    ('$customerId', '$titleId', '$firstName', '$lastName', '$emailAddress', '$phoneNumber', '$address', '$hashPassword', '$statusId', '$roleId', NOW(), NOW())") or die(mysqli_error($conn));
 
-$createCustomerQuery = mysqli_query($conn, "SELECT customer_tab.*, role_tab.role_name, status_tab.status_name FROM customer_tab, role_tab, status_tab WHERE customer_tab.role_id = role_tab.role_id AND customer_tab.status_id = status_tab.status_id AND customer_tab.email_address = '$emailAddress'") or die(mysqli_error($conn));
+$createCustomerQuery = mysqli_query($conn, "SELECT customer_tab.*, title_tab.title_name, role_tab.role_name, status_tab.status_name FROM customer_tab, title_tab, role_tab, status_tab WHERE customer_tab.title_id = title_tab.title_id AND customer_tab.role_id = role_tab.role_id AND customer_tab.status_id = status_tab.status_id AND customer_tab.email_address = '$emailAddress'") or die(mysqli_error($conn));
 $customerData = mysqli_fetch_assoc($createCustomerQuery);
 
 $response = [
@@ -97,15 +143,18 @@ $response = [
     'message' => "CUSTOMER SIGN UP SUCCESSFUL",
     'data' => [
         'customerId' => $customerData['customer_id'],
+        'titleId' => $customerData['title_id'],
+        'titleName' => $customerData['title_name'],
         'firstName' => $customerData['first_name'],
         'lastName' => $customerData['last_name'],
         'emailAddress' => $customerData['email_address'],
+        'phoneNumber' => $customerData['phone_number'],
+        'address' => $customerData['address'],
         'statusId' => $customerData['status_id'],
         'statusName' => $customerData['status_name'],
         'roleId' => $customerData['role_id'],
-        'statusId' => $customerData['status_id'],
         'roleName' => $customerData['role_name'],
-        'lastLoginDate' => $customerData['last_login_date'] ,
+        'lastLoginDate' => $customerData['last_login_date'],
         'createdAt' => $customerData['created_at'],
         'updatedAt' => $customerData['updated_at']
     ]

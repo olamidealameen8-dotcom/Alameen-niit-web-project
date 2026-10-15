@@ -12,7 +12,7 @@ if ($customerId == '') {
     goto end;
 }
 
-$checkCustomerQuery = mysqli_query($conn, "SELECT customer_tab.*, role_tab.role_name, status_tab.status_name FROM customer_tab, role_tab, status_tab WHERE customer_tab.role_id = role_tab.role_id AND customer_tab.status_id = status_tab.status_id AND customer_tab.customer_id = '$customerId'") or die(mysqli_error($conn));
+$checkCustomerQuery = mysqli_query($conn, "SELECT customer_tab.*, title_tab.title_name, role_tab.role_name, status_tab.status_name FROM customer_tab, title_tab, role_tab, status_tab WHERE customer_tab.title_id = title_tab.title_id AND customer_tab.role_id = role_tab.role_id AND customer_tab.status_id = status_tab.status_id AND customer_tab.customer_id = '$customerId'") or die(mysqli_error($conn));
 
 if (mysqli_num_rows($checkCustomerQuery) == 0) {
     $response = [

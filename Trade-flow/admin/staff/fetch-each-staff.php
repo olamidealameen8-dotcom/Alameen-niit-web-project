@@ -12,7 +12,7 @@ if ($staffId == '') {
     goto end;
 }
 
-$fetchEachStaffQuery = mysqli_query($conn, "SELECT staff_tab.*, role_tab.role_name, status_tab.status_name FROM staff_tab, role_tab, status_tab WHERE staff_tab.role_id = role_tab.role_id AND staff_tab.status_id = status_tab.status_id AND staff_tab.staff_id = '$staffId'") or die(mysqli_error($conn));
+$fetchEachStaffQuery = mysqli_query($conn, "SELECT staff_tab.*, title_tab.title_name, role_tab.role_name, status_tab.status_name FROM staff_tab, title_tab, role_tab, status_tab WHERE staff_tab.title_id = title_tab.title_id AND staff_tab.role_id = role_tab.role_id AND staff_tab.status_id = status_tab.status_id AND staff_tab.staff_id = '$staffId'") or die(mysqli_error($conn));
 
 if (mysqli_num_rows($fetchEachStaffQuery) == 0) {
     $response = [

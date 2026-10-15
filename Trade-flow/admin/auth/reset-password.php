@@ -49,6 +49,16 @@ if ($password !== $confirmPassword) {
     goto end;
 }
 
+$staffCheck = mysqli_query($conn, "SELECT * FROM staff_tab WHERE staff_id = '$staffId'  LIMIT 1") or die(mysqli_error($conn));
+if (mysqli_num_rows($staffCheck) == 0) {
+    $response = [
+        'success' => false,
+        'message' => "INVALID STAFF ID! Check your staff ID and try again"
+    ];
+    goto end;
+}
+
+
 $staffCheck = mysqli_query($conn, "SELECT * FROM staff_tab WHERE staff_id = '$staffId' AND reset_otp = '$resetOtp' LIMIT 1") or die(mysqli_error($conn));
 if (mysqli_num_rows($staffCheck) == 0) {
     $response = [
@@ -57,6 +67,7 @@ if (mysqli_num_rows($staffCheck) == 0) {
     ];
     goto end;
 }
+
 
 $hashPassword = md5($password);
 
