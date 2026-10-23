@@ -10,7 +10,7 @@ $phoneNumber = trim($_POST['phoneNumber']);
 $address = $_POST['address'];
 $password = $_POST['password'];
 $roleId = trim($_POST['roleId']);
-$statusId = trim($_POST['statusId']);
+$statusId = 1; // Status is always set to active on creation
 
 if ($titleId == '') {
     $response = [
@@ -83,15 +83,6 @@ if ($roleId == '') {
     ];
     goto end;
 }
-
-if ($statusId == '') {
-    $response = [
-        'success' => false,
-        'message' => "STATUS ID IS REQUIRED, Kindly fill in the status ID to continue"
-    ];
-    goto end;
-}
-
 $titleCheck = mysqli_query($conn, "SELECT * FROM title_tab WHERE title_id = '$titleId'") or die(mysqli_error($conn));
 if (mysqli_num_rows($titleCheck) == 0) {
     $response = [
@@ -115,15 +106,6 @@ if (mysqli_num_rows($roleCheck) == 0) {
     $response = [
         'success' => false,
         'message' => "INVALID ROLE ID! Selected role does not exist"
-    ];
-    goto end;
-}
-
-$statusCheck = mysqli_query($conn, "SELECT * FROM status_tab WHERE status_id = '$statusId'") or die(mysqli_error($conn));
-if (mysqli_num_rows($statusCheck) == 0) {
-    $response = [
-        'success' => false,
-        'message' => "INVALID STATUS ID! Selected status does not exist"
     ];
     goto end;
 }

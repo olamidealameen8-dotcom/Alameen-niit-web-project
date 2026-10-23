@@ -12,7 +12,8 @@ if ($searchContent == '') {
     goto end;
 }
 
-$searchQuery = mysqli_query($conn, "SELECT product_tab.*, categories_tab.categories_name, status_tab.status_name FROM product_tab, categories_tab, status_tab WHERE product_tab.categories_id = categories_tab.categories_id AND product_tab.status_id = status_tab.status_id AND (product_tab.product_name LIKE '%$searchContent%' OR product_tab.product_id LIKE '%$searchContent%' OR categories_tab.categories_name LIKE '%$searchContent%') ORDER BY product_tab.created_at DESC") or die(mysqli_error($conn));
+$escapedSearchContent = mysqli_real_escape_string($conn, $searchContent);
+$searchQuery = mysqli_query($conn, "SELECT product_tab.*, categories_tab.categories_name, status_tab.status_name FROM product_tab, categories_tab, status_tab WHERE product_tab.categories_id = categories_tab.categories_id AND product_tab.status_id = status_tab.status_id AND (product_tab.product_name LIKE '%$escapedSearchContent%' OR product_tab.product_id LIKE '%$escapedSearchContent%' OR product_tab.description LIKE '%$escapedSearchContent%' OR categories_tab.categories_name LIKE '%$escapedSearchContent%') ORDER BY product_tab.created_at DESC") or die(mysqli_error($conn));
 
 if (mysqli_num_rows($searchQuery) == 0) {
     $response = [

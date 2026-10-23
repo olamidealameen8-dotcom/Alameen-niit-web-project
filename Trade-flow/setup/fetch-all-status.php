@@ -2,7 +2,14 @@
 
 <?php
 
-$fetchAllStatusQuery = mysqli_query($conn, "SELECT * FROM status_tab ORDER BY created_at DESC") or die(mysqli_error($conn));
+$statusIds =  $_POST['statusIds'] ?? '';
+
+if ($statusIds === '') {
+    $query = "SELECT * FROM status_tab";
+}else {
+    $query = "SELECT * FROM status_tab WHERE status_id IN ($statusIds)";
+}
+$fetchAllStatusQuery = mysqli_query($conn, $query) or die(mysqli_error($conn));
 
 if (mysqli_num_rows($fetchAllStatusQuery) == 0) {
     $response = [

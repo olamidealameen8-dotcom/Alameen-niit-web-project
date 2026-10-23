@@ -2,7 +2,7 @@
 
 <?php
 
-$fetchAllCustomerQuery = mysqli_query($conn, "SELECT customer_tab.*, title_tab.title_name, role_tab.role_name, status_tab.status_name FROM customer_tab, title_tab, role_tab, status_tab WHERE customer_tab.title_id = title_tab.title_id AND customer_tab.role_id = role_tab.role_id AND customer_tab.status_id = status_tab.status_id ORDER BY customer_tab.created_at DESC") or die(mysqli_error($conn));
+$fetchAllCustomerQuery = mysqli_query($conn, "SELECT sn, customer_id, title_id, first_name, last_name, email_address, phone_number, address, status_id, role_id, reset_otp, last_login_date, created_at, updated_at FROM customer_tab ORDER BY customer_tab.created_at DESC") or die(mysqli_error($conn));
 
 if (mysqli_num_rows($fetchAllCustomerQuery) == 0) {
     $response = [

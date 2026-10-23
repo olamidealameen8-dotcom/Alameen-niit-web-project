@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 12, 2026 at 02:40 PM
+-- Generation Time: Oct 19, 2026 at 12:42 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -50,6 +50,7 @@ CREATE TABLE `categories_tab` (
   `categories_id` varchar(255) NOT NULL,
   `categories_name` varchar(255) NOT NULL,
   `status_id` int(11) NOT NULL,
+  `description` text NOT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -63,9 +64,12 @@ CREATE TABLE `categories_tab` (
 CREATE TABLE `customer_tab` (
   `sn` int(11) NOT NULL,
   `customer_id` varchar(255) NOT NULL,
+  `title_id` int(11) NOT NULL,
   `first_name` varchar(255) NOT NULL,
   `last_name` varchar(255) NOT NULL,
   `email_address` varchar(255) NOT NULL,
+  `phone_number` varchar(20) NOT NULL,
+  `address` text NOT NULL,
   `password` varchar(255) NOT NULL,
   `status_id` int(11) NOT NULL,
   `role_id` int(111) NOT NULL,
@@ -74,6 +78,13 @@ CREATE TABLE `customer_tab` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `customer_tab`
+--
+
+INSERT INTO `customer_tab` (`sn`, `customer_id`, `title_id`, `first_name`, `last_name`, `email_address`, `phone_number`, `address`, `password`, `status_id`, `role_id`, `reset_otp`, `last_login_date`, `created_at`, `updated_at`) VALUES
+(1, 'CUST20261013140530', 0, 'adigun', 'sofiu', 'adigun08@gmail.com', '', '', 'b182725ae33b8847665943e58c7687f1', 1, 1, 0, NULL, '2026-10-13 13:05:30', '2026-10-13 12:05:30');
 
 -- --------------------------------------------------------
 
@@ -110,9 +121,9 @@ CREATE TABLE `payment_method_tab` (
 --
 
 INSERT INTO `payment_method_tab` (`sn`, `payment_method_id`, `payment_method_name`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Wallet', '2026-09-23 08:23:42', '2026-09-23 07:23:42'),
-(2, 2, 'Bank Transfer', '2026-09-23 08:23:42', '2026-09-23 07:23:42'),
-(3, 3, 'Cash', '2026-09-23 08:23:42', '2026-09-23 07:23:42');
+(1, 1, 'Wallet', '2026-10-13 12:25:52', '2026-10-13 11:25:52'),
+(2, 2, 'Bank Transfer', '2026-10-13 12:25:52', '2026-10-13 11:25:52'),
+(3, 3, 'Cash', '2026-10-13 12:25:52', '2026-10-13 11:25:52');
 
 -- --------------------------------------------------------
 
@@ -180,15 +191,16 @@ INSERT INTO `role_tab` (`sn`, `role_id`, `role_name`, `created_at`, `updated_at`
 CREATE TABLE `staff_tab` (
   `sn` int(11) NOT NULL,
   `staff_id` varchar(255) NOT NULL,
+  `title_id` int(11) NOT NULL,
   `first_name` varchar(255) NOT NULL,
   `last_name` varchar(255) NOT NULL,
   `phone_number` varchar(255) NOT NULL,
   `email_address` varchar(255) NOT NULL,
   `address` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
+  `password` varchar(255) DEFAULT NULL,
   `status_id` int(11) NOT NULL,
   `role_id` int(111) NOT NULL,
-  `reset_otp` int(11) NOT NULL,
+  `reset_otp` int(11) NOT NULL DEFAULT 0,
   `last_login_date` datetime DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -198,8 +210,9 @@ CREATE TABLE `staff_tab` (
 -- Dumping data for table `staff_tab`
 --
 
-INSERT INTO `staff_tab` (`sn`, `staff_id`, `first_name`, `last_name`, `phone_number`, `email_address`, `address`, `password`, `status_id`, `role_id`, `reset_otp`, `last_login_date`, `created_at`, `updated_at`) VALUES
-(1, 'STAFF20261012022701', 'ola', 'olaaa', '08079475657', 'olamide@gmail.com', '07,isabo,abk', '25f9e794323b453885f5181f1b624d0b', 1, 3, 0, '2026-10-12 14:34:32', '2026-10-12 13:27:01', '2026-10-12 12:34:32');
+INSERT INTO `staff_tab` (`sn`, `staff_id`, `title_id`, `first_name`, `last_name`, `phone_number`, `email_address`, `address`, `password`, `status_id`, `role_id`, `reset_otp`, `last_login_date`, `created_at`, `updated_at`) VALUES
+(1, 'STAFF20261012022701', 0, 'ola', 'olaaa', '08079475657', 'olamide@gmail.com', '07,isabo,abk', '25f9e794323b453885f5181f1b624d0b', 1, 3, 0, '2026-10-12 14:34:32', '2026-10-12 13:27:01', '2026-10-12 12:34:32'),
+(7, 'STAFF20261014034025', 1, 'Afoo', 'Afoo', '08079447676', 'afoo@gmail.com', '10, NIIT ABEOKUTA, OGUN STATE', NULL, 1, 2, 0, NULL, '2026-10-14 14:40:25', '2026-10-14 13:40:25');
 
 -- --------------------------------------------------------
 
@@ -231,6 +244,31 @@ INSERT INTO `status_tab` (`sn`, `status_id`, `status_name`, `created_at`, `updat
 (9, 9, 'Failed', '2026-09-22 17:19:03', '2026-09-22 16:19:03'),
 (10, 10, 'Done', '2026-09-22 17:19:18', '2026-09-22 16:19:18'),
 (11, 11, 'In Stock', '2026-10-12 10:56:55', '2026-10-12 09:56:55');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `title_tab`
+--
+
+CREATE TABLE `title_tab` (
+  `sn` int(11) NOT NULL,
+  `title_id` int(11) NOT NULL,
+  `title_name` varchar(255) NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `title_tab`
+--
+
+INSERT INTO `title_tab` (`sn`, `title_id`, `title_name`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Mr', NULL, '2026-10-13 11:31:11'),
+(2, 2, 'Mrs', NULL, '2026-10-13 11:31:11'),
+(3, 3, 'Dr', NULL, '2026-10-13 11:31:11'),
+(4, 4, 'Prof', NULL, '2026-10-13 11:31:11'),
+(5, 5, 'Engr', NULL, '2026-10-13 11:31:11');
 
 -- --------------------------------------------------------
 
@@ -308,6 +346,12 @@ ALTER TABLE `status_tab`
   ADD PRIMARY KEY (`sn`);
 
 --
+-- Indexes for table `title_tab`
+--
+ALTER TABLE `title_tab`
+  ADD PRIMARY KEY (`sn`);
+
+--
 -- Indexes for table `transaction_tab`
 --
 ALTER TABLE `transaction_tab`
@@ -333,7 +377,7 @@ ALTER TABLE `categories_tab`
 -- AUTO_INCREMENT for table `customer_tab`
 --
 ALTER TABLE `customer_tab`
-  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `order_tab`
@@ -363,13 +407,19 @@ ALTER TABLE `role_tab`
 -- AUTO_INCREMENT for table `staff_tab`
 --
 ALTER TABLE `staff_tab`
-  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `status_tab`
 --
 ALTER TABLE `status_tab`
   MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `title_tab`
+--
+ALTER TABLE `title_tab`
+  MODIFY `sn` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `transaction_tab`

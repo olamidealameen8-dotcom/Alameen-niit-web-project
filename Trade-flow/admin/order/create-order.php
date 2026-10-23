@@ -25,7 +25,7 @@ if ($productId == '') {
 if ($statusId == '') {
     $response = [
         'success' => false,
-        'message' => "STATUS ID IS REQUIRED, Kindly fill in the status ID (e.g. 1 for Active, 2 for Inactive)"
+        'message' => "STATUS ID IS REQUIRED, Kindly fill in the status ID to continue"
     ];
     goto end;
 }
@@ -61,7 +61,7 @@ $orderId = 'ORD' . date("YmdHis");
 
 mysqli_query($conn, "INSERT INTO `order_tab` (`order_id`, `customer_id`, `product_id`, `status_id`, `created_at`, `updated_at`) VALUES ('$orderId', '$customerId', '$productId', '$statusId', NOW(), NOW())") or die(mysqli_error($conn));
 
-$fetchOrderQuery = mysqli_query($conn, "SELECT order_tab.*, customer_tab.first_name, customer_tab.last_name, product_tab.product_name, status_tab.status_name FROM order_tab, customer_tab, product_tab, status_tab WHERE order_tab.customer_id = customer_tab.customer_id AND order_tab.product_id = product_tab.product_id AND order_tab.status_id = status_tab.status_id AND order_tab.order_id = '$orderId'") or die(mysqli_error($conn));
+$fetchOrderQuery = mysqli_query($conn, "SELECT order_tab.*, customer_tab.first_name, customer_tab.last_name, customer_tab.phone_number, customer_tab.email_address, customer_tab.address, product_tab.product_name, product_tab.product_price, status_tab.status_name FROM order_tab, customer_tab, product_tab, status_tab WHERE order_tab.customer_id = customer_tab.customer_id AND order_tab.product_id = product_tab.product_id AND order_tab.status_id = status_tab.status_id AND order_tab.order_id = '$orderId'") or die(mysqli_error($conn));
 $orderData = mysqli_fetch_assoc($fetchOrderQuery);
 
 $response = [
@@ -72,8 +72,12 @@ $response = [
         'customerId' => $orderData['customer_id'],
         'firstName' => $orderData['first_name'],
         'lastName' => $orderData['last_name'],
+        'phoneNumber' => $orderData['phone_number'],
+        'emailAddress' => $orderData['email_address'],
+        'address' => $orderData['address'],
         'productId' => $orderData['product_id'],
         'productName' => $orderData['product_name'],
+        'productPrice' => $orderData['product_price'],
         'statusId' => $orderData['status_id'],
         'statusName' => $orderData['status_name'],
         'createdAt' => $orderData['created_at'],

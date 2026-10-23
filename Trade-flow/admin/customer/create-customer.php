@@ -2,7 +2,7 @@
 
 <?php
 // DECLARATION OF VARIABLES
-$titleId = trim($_POST['titleId']);
+$titleId = trim($_POST ['titleId']);
 $firstName = trim($_POST['firstName']);
 $lastName = trim($_POST['lastName']);
 $emailAddress = trim($_POST['emailAddress']);
@@ -115,7 +115,7 @@ $statusCheck = mysqli_query($conn, "SELECT * FROM status_tab WHERE status_id = '
 if (mysqli_num_rows($statusCheck) == 0) {
     $response = [
         'success' => false,
-        'message' => "INVALID STATUS ID! Selected status does not exist"
+        'message' => "INVALID STATUS ID! Selected status ID does not exist in status_tab"
     ];
     goto end;
 }

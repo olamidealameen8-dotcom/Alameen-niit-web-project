@@ -3,6 +3,7 @@
 <?php
 // DECLARATION OF VARIABLES
 $categoryName = trim($_POST['categoryName']);
+$description = trim($_POST['description']);
 $statusId = trim($_POST['statusId']);
 
 if ($categoryName == '') {
@@ -13,10 +14,18 @@ if ($categoryName == '') {
     goto end;
 }
 
+if ($description == '') {
+    $response = [
+        'success' => false,
+        'message' => "DESCRIPTION IS REQUIRED, Kindly fill in the description to continue"
+    ];
+    goto end;
+}
+
 if ($statusId == '') {
     $response = [
         'success' => false,
-        'message' => "STATUS ID IS REQUIRED, Kindly fill in the status ID (e.g. 1 for Active, 2 for Inactive)"
+        'message' => "STATUS ID IS REQUIRED, Kindly fill in the status ID to continue"
     ];
     goto end;
 }
@@ -40,8 +49,9 @@ if (mysqli_num_rows($checkCategoryQuery) > 0) {
 }
 
 $categoryId = 'CAT' . date("YmdHis");
+$escapedDescription = mysqli_real_escape_string($conn, $description);
 
-mysqli_query($conn, "INSERT INTO `categories_tab` (`categories_id`, `categories_name`, `status_id`, `created_at`, `updated_at`) VALUES ('$categoryId', '$categoryName', '$statusId', NOW(), NOW())") or die(mysqli_error($conn));
+mysqli_query($conn, "INSERT INTO `categories_tab` (`categories_id`, `categories_name`, `description`, `status_id`, `created_at`, `updated_at`) VALUES ('$categoryId', '$categoryName', '$escapedDescription', '$statusId', NOW(), NOW())") or die(mysqli_error($conn));
 
 $fetchCategoryQuery = mysqli_query($conn, "SELECT categories_tab.*, status_tab.status_name FROM categories_tab, status_tab WHERE categories_tab.status_id = status_tab.status_id AND categories_tab.categories_id = '$categoryId'") or die(mysqli_error($conn));
 $categoryData = mysqli_fetch_assoc($fetchCategoryQuery);
@@ -52,6 +62,7 @@ $response = [
     'data' => [
         'categoryId' => $categoryData['categories_id'],
         'categoryName' => $categoryData['categories_name'],
+        'description' => $categoryData['description'],
         'statusId' => $categoryData['status_id'],
         'statusName' => $categoryData['status_name'],
         'createdAt' => $categoryData['created_at'],
