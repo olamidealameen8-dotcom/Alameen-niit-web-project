@@ -8,7 +8,6 @@ $lastName = trim($_POST['lastName']);
 $emailAddress = trim($_POST['emailAddress']);
 $phoneNumber = trim($_POST['phoneNumber']);
 $address = $_POST['address'];
-$roleId = trim($_POST['roleId']);
 $statusId = trim($_POST['statusId']);
 
 if ($titleId == '') {
@@ -68,13 +67,7 @@ if ($address == '') {
 }
 
 
-if ($roleId == '') {
-    $response = [
-        'success' => false,
-        'message' => "ROLE ID IS REQUIRED, Kindly fill in the role ID to continue"
-    ];
-    goto end;
-}
+
 
 if ($statusId == '') {
     $response = [
@@ -102,14 +95,7 @@ if (mysqli_num_rows($emailCheck) > 0) {
     goto end;
 }
 
-$roleCheck = mysqli_query($conn, "SELECT * FROM role_tab WHERE role_id = '$roleId'") or die(mysqli_error($conn));
-if (mysqli_num_rows($roleCheck) == 0) {
-    $response = [
-        'success' => false,
-        'message' => "INVALID ROLE ID! Selected role does not exist"
-    ];
-    goto end;
-}
+
 
 $statusCheck = mysqli_query($conn, "SELECT * FROM status_tab WHERE status_id = '$statusId'") or die(mysqli_error($conn));
 if (mysqli_num_rows($statusCheck) == 0) {
@@ -124,8 +110,8 @@ $customerId = 'CUST' . date("YmdHis");
 
 
 mysqli_query($conn, "INSERT INTO `customer_tab` 
-    (`customer_id`, `title_id`, `first_name`, `last_name`, `email_address`, `phone_number`, `address`,  `status_id`, `role_id`, `created_at`, `updated_at`) VALUES 
-    ('$customerId', '$titleId', '$firstName', '$lastName', '$emailAddress', '$phoneNumber', '$address',  '$statusId', '$roleId', NOW(), NOW())") or die(mysqli_error($conn));
+    (`customer_id`, `title_id`, `first_name`, `last_name`, `email_address`, `phone_number`, `address`,  `status_id`,  `created_at`, `updated_at`) VALUES 
+    ('$customerId', '$titleId', '$firstName', '$lastName', '$emailAddress', '$phoneNumber', '$address',  '$statusId',  NOW(), NOW())") or die(mysqli_error($conn));
 
 $fetchCustomerQuery = mysqli_query($conn, "SELECT customer_tab.*, title_tab.title_name, role_tab.role_name, status_tab.status_name FROM customer_tab, title_tab, role_tab, status_tab WHERE customer_tab.title_id = title_tab.title_id AND customer_tab.role_id = role_tab.role_id AND customer_tab.status_id = status_tab.status_id AND customer_tab.customer_id = '$customerId'") or die(mysqli_error($conn));
 $customerData = mysqli_fetch_assoc($fetchCustomerQuery);
@@ -144,8 +130,6 @@ $response = [
         'address' => $customerData['address'],
         'statusId' => $customerData['status_id'],
         'statusName' => $customerData['status_name'],
-        'roleId' => $customerData['role_id'],
-        'roleName' => $customerData['role_name'],
         'createdAt' => $customerData['created_at'],
         'updatedAt' => $customerData['updated_at']
     ]

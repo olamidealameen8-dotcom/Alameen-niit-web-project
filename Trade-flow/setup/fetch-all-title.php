@@ -2,7 +2,14 @@
 
 <?php
 
-$fetchAllTitleQuery = mysqli_query($conn, "SELECT * FROM title_tab ORDER BY created_at DESC") or die(mysqli_error($conn));
+$titleIds =  $_POST['titleIds'] ?? '';
+
+if ($titleIds === '') {
+    $query = "SELECT * FROM title_tab";
+}else {
+    $query = "SELECT * FROM title_tab WHERE title_id IN ($titleIds)";
+}
+$fetchAllTitleQuery = mysqli_query($conn, $query) or die(mysqli_error($conn));
 
 if (mysqli_num_rows($fetchAllTitleQuery) == 0) {
     $response = [

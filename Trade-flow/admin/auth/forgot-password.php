@@ -34,20 +34,24 @@ if (mysqli_num_rows($emailCheck) == 0) {
 $staffData = mysqli_fetch_assoc($emailCheck);
 $staffId = $staffData['staff_id'];
 $emailAddress = $staffData['email_address'];
+$staffName = $staffData['first_name'] . ' ' . $staffData['last_name'];
 
-$resetotp = rand(100000, 999999); // Generate a random 6-digit reset otp
+$resetOtp = rand(100000, 999999);
 
-mysqli_query($conn, "UPDATE staff_tab SET reset_otp='$resetotp', updated_at=NOW() WHERE staff_id = '$staffId'") or die(mysqli_error($conn));
+
+mysqli_query($conn, "UPDATE staff_tab SET reset_otp='$resetOtp', updated_at=NOW() WHERE staff_id = '$staffId'") or die(mysqli_error($conn));
 
 $response = [
     'success' => true,
     'message' => "RESET OTP GENERATED SUCCESSFULLY",
     'data' => [
         'staffId' => $staffId,
-        'resetotp' => $resetotp,
+        'resetotp' => $resetOtp,
         'emailAddress' => $emailAddress
     ]
 ];
+require_once __DIR__ . "/../../mail/sent-otp-to-mail.php";
+
 
 end:
 echo json_encode($response);
