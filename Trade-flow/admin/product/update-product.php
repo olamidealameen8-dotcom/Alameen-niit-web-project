@@ -8,6 +8,7 @@ $productName = trim($_POST['productName']);
 $productPrice = trim($_POST['productPrice']);
 $quantity = trim($_POST['quantity']);
 $description = trim($_POST['description']);
+$imageUrl = trim($_POST['imageUrl']);
 $statusId = trim($_POST['statusId']);
 
 if ($productId == '') {
@@ -94,7 +95,8 @@ if (mysqli_num_rows($checkProductQuery) == 0) {
 }
 
 $escapedDescription = mysqli_real_escape_string($conn, $description);
-mysqli_query($conn, "UPDATE product_tab SET categories_id = '$categoryId', product_name = '$productName', product_price = '$productPrice', quantity = '$quantity', description = '$escapedDescription', status_id = '$statusId', updated_at = NOW() WHERE product_id = '$productId'") or die(mysqli_error($conn));
+$escapedImageUrl = mysqli_real_escape_string($conn, $imageUrl);
+mysqli_query($conn, "UPDATE product_tab SET categories_id = '$categoryId', product_name = '$productName', product_price = '$productPrice', quantity = '$quantity', description = '$escapedDescription', image_url = '$escapedImageUrl', status_id = '$statusId', updated_at = NOW() WHERE product_id = '$productId'") or die(mysqli_error($conn));
 
 $fetchUpdatedProduct = mysqli_query($conn, "SELECT product_tab.*, categories_tab.categories_name, status_tab.status_name FROM product_tab, categories_tab, status_tab WHERE product_tab.categories_id = categories_tab.categories_id AND product_tab.status_id = status_tab.status_id AND product_tab.product_id = '$productId'") or die(mysqli_error($conn));
 $productData = mysqli_fetch_assoc($fetchUpdatedProduct);
@@ -110,6 +112,7 @@ $response = [
         'productPrice' => $productData['product_price'],
         'quantity' => $productData['quantity'],
         'description' => $productData['description'],
+        'imageUrl' => $productData['image_url'],
         'statusId' => $productData['status_id'],
         'statusName' => $productData['status_name'],
         'createdAt' => $productData['created_at'],

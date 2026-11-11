@@ -32,17 +32,17 @@ if (mysqli_num_rows($emailCheck) == 0) {
 $customerData = mysqli_fetch_assoc($emailCheck);
 $customerId = $customerData['customer_id'];
 $emailAddress = $customerData['email_address'];
+$staffName = $customerData['first_name'] . ' ' . $customerData['last_name'];
+$resetOtp = rand(100000, 999999);
 
-$resetotp = rand(100000, 999999); // Generate a random 6-digit reset otp
-
-mysqli_query($conn, "UPDATE customer_tab SET reset_otp='$resetotp', updated_at=NOW() WHERE customer_id = '$customerId'") or die(mysqli_error($conn));
+mysqli_query($conn, "UPDATE customer_tab SET reset_otp='$resetOtp', updated_at=NOW() WHERE customer_id = '$customerId'") or die(mysqli_error($conn));
 
 $response = [
     'success' => true,
     'message' => "RESET OTP GENERATED SUCCESSFULLY",
     'data' => [
         'customerId' => $customerId,
-        'resetotp' => $resetotp,
+        'resetotp' => $resetOtp,
         'emailAddress' => $emailAddress
     ]
 ];

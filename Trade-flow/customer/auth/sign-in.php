@@ -31,7 +31,7 @@ if ($password == '') {
 
 $hashPassword = md5($password);
 
-$loginQuery = mysqli_query($conn, "SELECT customer_tab.*, role_tab.role_name, status_tab.status_name FROM customer_tab, role_tab, status_tab WHERE customer_tab.role_id = role_tab.role_id AND customer_tab.status_id = status_tab.status_id AND customer_tab.email_address = '$emailAddress' AND customer_tab.password = '$hashPassword'") or die(mysqli_error($conn));
+$loginQuery = mysqli_query($conn, "SELECT * FROM customer_tab WHERE email_address = '$emailAddress' AND password = '$hashPassword' LIMIT 1") or die(mysqli_error($conn));
 
 if (mysqli_num_rows($loginQuery) == 0) {
     $response = [
@@ -43,18 +43,10 @@ if (mysqli_num_rows($loginQuery) == 0) {
 
 $customerData = mysqli_fetch_assoc($loginQuery);
 
-if ($customerData['status_id'] !== '1') {
-    $response = [
-        'success' => false,
-        'message' => "ACCOUNT SUSPENDED OR INACTIVE! Contact system administrator for support"
-    ];
-    goto end;
-}
-
 $customerId = $customerData['customer_id'];
 
 $lastLoginDate = date("Y-m-d H:i:s");
-@mysqli_query($conn, "UPDATE customer_tab SET last_login_date = '$lastLoginDate' WHERE customer_id = '$customerId'");
+mysqli_query($conn, "UPDATE customer_tab SET last_login_date = '$lastLoginDate' WHERE customer_id = '$customerId'") or die(mysqli_error($conn));
 
 $response = [
     'success' => true,
@@ -64,10 +56,8 @@ $response = [
         'firstName' => $customerData['first_name'],
         'lastName' => $customerData['last_name'],
         'emailAddress' => $customerData['email_address'],
-        'statusId' => $customerData['status_id'],
-        'statusName' => $customerData['status_name'],
-        'roleId' => $customerData['role_id'],
-        'roleName' => $customerData['role_name'],
+        'phoneNumber' => $customerData['phone_number'],
+        'address' => $customerData['address'],
         'lastLoginDate' => $lastLoginDate,
         'createdAt' => $customerData['created_at'],
         'updatedAt' => $customerData['updated_at']

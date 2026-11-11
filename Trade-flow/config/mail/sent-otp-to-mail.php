@@ -7,8 +7,6 @@ require_once __DIR__ . '/PHPMailer/src/Exception.php';
 require_once __DIR__ . '/PHPMailer/src/PHPMailer.php';
 require_once __DIR__ . '/PHPMailer/src/SMTP.php';
 
-
-
 $mail = new PHPMailer(true);
 
 try {
@@ -18,50 +16,38 @@ try {
     $mail->Host = 'smtp.gmail.com';
     $mail->SMTPAuth = true;
 
-    // Your Gmail
-    $mail->Username = 'yourgmail@gmail.com';
+    $mail->Username = 'olamidealameen8@gmail.com';
 
-    // Gmail App Password
-    $mail->Password = 'xxxx xxxx xxxx xxxx';
+    $mail->Password = 'joux jomy olpo ppgq';
 
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port = 587;
 
-    // Sender
-    $mail->setFrom(
-        'yourgmail@gmail.com',
-        'My Website'
-    );
+    $mail->setFrom('olamidealameen8@gmail.com', 'Trade Flow');
 
-    // Where you want to receive the OTP
-    $mail->addAddress(
-        $emailAddress
-    );
+    // Recipient — $emailAddress is passed in from the calling script (forgot-password.php)
+    $mail->addAddress($emailAddress);
 
     $mail->isHTML(true);
 
-    $mail->Subject = 'Your OTP Code';
+    $mail->Subject = 'Your OTP Code — Trade Flow';
 
     $mail->Body = '
         <h2>OTP Verification</h2>
-
-        <p>Your OTP code is:</p>
-
-        <h1>' . $resetOtp . '</h1>
-
-        <p>This code will expire in 10 minutes.</p>
+        <p>Hello ' . $staffName . ',</p>
+        <p>Your password reset OTP code is:</p>
+        <h1 style="letter-spacing: 8px; color: #2d6a4f;">' . $resetOtp . '</h1>
+        <p>This code will expire in 10 minutes. Do not share it with anyone.</p>
+        <p>If you did not request this, please ignore this email.</p>
+        <br>
+        <p>— Trade Flow Team</p>
     ';
 
-    $mail->AltBody = strip_tags('Your OTP code is: ' . $resetOtp);
+    $mail->AltBody = 'Your OTP code is: ' . $resetOtp . '. This code will expire in 10 minutes.';
 
     $mail->send();
 
-    echo "OTP sent successfully.";
-
 } catch (Exception $e) {
-
-    echo "Message could not be sent.";
-
-    echo "<br>";
-    echo $mail->ErrorInfo;
+    // Silently log the error — do NOT echo here, it would break the JSON response
+    error_log('PHPMailer Error: ' . $mail->ErrorInfo);
 }
