@@ -1,4 +1,5 @@
 <?php require_once __DIR__ . '/../../config/connection.php'; ?>
+<?php require_once __DIR__ . '/../../config/upload-helper.php'; ?>
 
 <?php
 // DECLARATION OF VARIABLES
@@ -6,6 +7,16 @@ $categoryName = trim($_POST['categoryName']);
 $description = trim($_POST['description']);
 $imageUrl = trim($_POST['imageUrl']);
 $statusId = trim($_POST['statusId']);
+
+// If a file is sent directly in this request
+if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+    $uploadResult = uploadImageFile($_FILES['image'], 'categories');
+    if (!$uploadResult['success']) {
+        $response = $uploadResult;
+        goto end;
+    }
+    $imageUrl = $uploadResult['data']['imageUrl'];
+}
 
 if ($categoryName == '') {
     $response = [
@@ -26,7 +37,7 @@ if ($description == '') {
 if ($imageUrl == '') {
     $response = [
         'success' => false,
-        'message' => "IMAGE URL IS REQUIRED, Kindly fill in the image URL to continue"
+        'message' => "IMAGE IS REQUIRED. Please select an image file or provide an imageUrl"
     ];
     goto end;
 }

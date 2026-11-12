@@ -1,16 +1,19 @@
 <?php require_once __DIR__ . '/../../config/connection.php'; ?>
+<?php require_once __DIR__ . '/../../config/upload-helper.php'; ?>
 
 <?php
 // DECLARATION OF VARIABLES
 $staffId = trim($_POST['staffId']);
-$titleId = trim($_POST['titleId']);
-$firstName = trim($_POST['firstName']);
-$lastName = trim($_POST['lastName']);
-$emailAddress = trim($_POST['emailAddress']);
-$phoneNumber = trim($_POST['phoneNumber']);
-$address = trim($_POST['address']);
-$roleId = trim($_POST['roleId']);
-$statusId = trim($_POST['statusId']);
+$titleId = isset($_POST['titleId']) ? trim($_POST['titleId']) : '';
+$firstName = isset($_POST['firstName']) ? trim($_POST['firstName']) : '';
+$lastName = isset($_POST['lastName']) ? trim($_POST['lastName']) : '';
+$fullName = isset($_POST['fullName']) ? trim($_POST['fullName']) : '';
+$emailAddress = isset($_POST['emailAddress']) ? trim($_POST['emailAddress']) : '';
+$phoneNumber = isset($_POST['phoneNumber']) ? trim($_POST['phoneNumber']) : '';
+$address = isset($_POST['address']) ? trim($_POST['address']) : '';
+$roleId = isset($_POST['roleId']) ? trim($_POST['roleId']) : '';
+$statusId = isset($_POST['statusId']) ? trim($_POST['statusId']) : '';
+$profileImage = isset($_POST['profileImage']) ? trim($_POST['profileImage']) : (isset($_POST['imageUrl']) ? trim($_POST['imageUrl']) : '');
 
 // STAFF ID VALIDATION
 if ($staffId == '') {
@@ -30,51 +33,66 @@ if (mysqli_num_rows($checkStaffQuery) == 0) {
     goto end;
 }
 
-// TITLE VALIDATION
-if ($titleId == '') {
-    $response = [
-        'success' => false,
-        'message' => 'TITLE ID IS REQUIRED'
-    ];
-    goto end;
+$currentStaff = mysqli_fetch_assoc($checkStaffQuery);
+
+// Handle direct file upload for profile image
+if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+    $uploadResult = uploadImageFile($_FILES['image'], 'profiles');
+    if (!$uploadResult['success']) {
+        $response = $uploadResult;
+        goto end;
+    }
+    $profileImage = $uploadResult['data']['imageUrl'];
+} elseif (isset($_FILES['profileImage']) && $_FILES['profileImage']['error'] === UPLOAD_ERR_OK) {
+    $uploadResult = uploadImageFile($_FILES['profileImage'], 'profiles');
+    if (!$uploadResult['success']) {
+        $response = $uploadResult;
+        goto end;
+    }
+    $profileImage = $uploadResult['data']['imageUrl'];
 }
 
-$checkTitleQuery = mysqli_query($conn, "SELECT * FROM title_tab WHERE title_id = '$titleId'") or die(mysqli_error($conn));
-if (mysqli_num_rows($checkTitleQuery) == 0) {
-    $response = [
-        'success' => false,
-        'message' => "INVALID TITLE ID! Selected title ID ($titleId) does not exist in title_tab"
-    ];
-    goto end;
+// If no new image was uploaded or provided, preserve current image
+if ($profileImage == '') {
+    $profileImage = isset($currentStaff['profile_image']) ? $currentStaff['profile_image'] : '';
 }
 
-// FIRST NAME VALIDATION
+// Split full name if provided instead of first/last name
+if ($fullName != '' && $firstName == '' && $lastName == '') {
+    $nameParts = explode(' ', $fullName, 2);
+    $firstName = $nameParts[0];
+    $lastName = isset($nameParts[1]) ? $nameParts[1] : '';
+}
+
+// If first/last name still empty, retain existing
 if ($firstName == '') {
-    $response = [
-        'success' => false,
-        'message' => 'FIRST NAME IS REQUIRED'
-    ];
-    goto end;
+    $firstName = $currentStaff['first_name'];
 }
-
-// LAST NAME VALIDATION
 if ($lastName == '') {
-    $response = [
-        'success' => false,
-        'message' => 'LAST NAME IS REQUIRED'
-    ];
-    goto end;
+    $lastName = $currentStaff['last_name'];
 }
 
-// EMAIL VALIDATION
+// Retain existing fields if not supplied in profile edit form
+if ($titleId == '') {
+    $titleId = $currentStaff['title_id'];
+}
 if ($emailAddress == '') {
-    $response = [
-        'success' => false,
-        'message' => 'EMAIL ADDRESS IS REQUIRED'
-    ];
-    goto end;
+    $emailAddress = $currentStaff['email_address'];
+}
+if ($phoneNumber == '') {
+    $phoneNumber = $currentStaff['phone_number'];
+}
+if ($address == '') {
+    $address = $currentStaff['address'];
+}
+if ($roleId == '') {
+    $roleId = $currentStaff['role_id'];
+}
+if ($statusId == '') {
+    $statusId = $currentStaff['status_id'];
 }
 
+// VALIDATIONS
 if (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
     $response = [
         'success' => false,
@@ -92,77 +110,44 @@ if (mysqli_num_rows($emailCheck) > 0) {
     goto end;
 }
 
-// PHONE NUMBER VALIDATION
-if ($phoneNumber == '') {
-    $response = [
-        'success' => false,
-        'message' => 'PHONE NUMBER IS REQUIRED'
-    ];
-    goto end;
-}
+$escapedAddress = mysqli_real_escape_string($conn, $address);
+$escapedProfileImage = mysqli_real_escape_string($conn, $profileImage);
 
-// ADDRESS VALIDATION
-if ($address == '') {
-    $response = [
-        'success' => false,
-        'message' => 'ADDRESS IS REQUIRED'
-    ];
-    goto end;
-}
+mysqli_query($conn, "UPDATE staff_tab SET 
+    title_id = '$titleId', 
+    first_name = '$firstName', 
+    last_name = '$lastName', 
+    email_address = '$emailAddress', 
+    phone_number = '$phoneNumber', 
+    address = '$escapedAddress', 
+    profile_image = '$escapedProfileImage', 
+    role_id = '$roleId', 
+    status_id = '$statusId', 
+    updated_at = NOW() 
+WHERE staff_id = '$staffId'") or die(mysqli_error($conn));
 
-// ROLE VALIDATION
-if ($roleId == '') {
-    $response = [
-        'success' => false,
-        'message' => 'ROLE ID IS REQUIRED'
-    ];
-    goto end;
-}
-
-$checkRoleQuery = mysqli_query($conn, "SELECT * FROM role_tab WHERE role_id = '$roleId'") or die(mysqli_error($conn));
-if (mysqli_num_rows($checkRoleQuery) == 0) {
-    $response = [
-        'success' => false,
-        'message' => "INVALID ROLE ID! Selected role ID ($roleId) does not exist in role_tab"
-    ];
-    goto end;
-}
-
-// STATUS VALIDATION
-if ($statusId == '') {
-    $response = [
-        'success' => false,
-        'message' => 'STATUS ID IS REQUIRED'
-    ];
-    goto end;
-}
-
-$checkStatusQuery = mysqli_query($conn, "SELECT * FROM status_tab WHERE status_id = '$statusId'") or die(mysqli_error($conn));
-if (mysqli_num_rows($checkStatusQuery) == 0) {
-    $response = [
-        'success' => false,
-        'message' => "INVALID STATUS ID! Selected status ID ($statusId) does not exist in status_tab"
-    ];
-    goto end;
-}
-
-mysqli_query($conn, "UPDATE staff_tab SET title_id = '$titleId', first_name = '$firstName', last_name = '$lastName', email_address = '$emailAddress', phone_number = '$phoneNumber', address = '$address', role_id = '$roleId', status_id = '$statusId', updated_at = NOW() WHERE staff_id = '$staffId'") or die(mysqli_error($conn));
-
-$fetchUpdatedStaff = mysqli_query($conn, "SELECT staff_tab.*, title_tab.title_name, role_tab.role_name, status_tab.status_name FROM staff_tab, title_tab, role_tab, status_tab WHERE staff_tab.title_id = title_tab.title_id AND staff_tab.role_id = role_tab.role_id AND staff_tab.status_id = status_tab.status_id AND staff_tab.staff_id = '$staffId'") or die(mysqli_error($conn));
+$fetchUpdatedStaff = mysqli_query($conn, "SELECT staff_tab.*, title_tab.title_name, role_tab.role_name, status_tab.status_name FROM staff_tab 
+    LEFT JOIN title_tab ON staff_tab.title_id = title_tab.title_id 
+    LEFT JOIN role_tab ON staff_tab.role_id = role_tab.role_id 
+    LEFT JOIN status_tab ON staff_tab.status_id = status_tab.status_id 
+    WHERE staff_tab.staff_id = '$staffId'") or die(mysqli_error($conn));
 $staffData = mysqli_fetch_assoc($fetchUpdatedStaff);
 
 $response = [
     'success' => true,
-    'message' => 'STAFF UPDATED SUCCESSFULLY',
+    'message' => 'PROFILE UPDATED SUCCESSFULLY',
     'data' => [
         'staffId' => $staffData['staff_id'],
         'titleId' => $staffData['title_id'],
         'titleName' => $staffData['title_name'],
         'firstName' => $staffData['first_name'],
         'lastName' => $staffData['last_name'],
+        'fullName' => trim($staffData['first_name'] . ' ' . $staffData['last_name']),
         'emailAddress' => $staffData['email_address'],
         'phoneNumber' => $staffData['phone_number'],
         'address' => $staffData['address'],
+        'profileImage' => $staffData['profile_image'],
+        'imageUrl' => $staffData['profile_image'],
         'statusId' => $staffData['status_id'],
         'statusName' => $staffData['status_name'],
         'roleId' => $staffData['role_id'],

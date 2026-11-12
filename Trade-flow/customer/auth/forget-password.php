@@ -47,6 +47,18 @@ $response = [
     ]
 ];
 
+// Safely load and send mail — will not crash the endpoint if mail network fails
+$mailFile = __DIR__ . "/../../config/mail/sent-otp-to-mail.php";
+if (file_exists($mailFile)) {
+    try {
+        require $mailFile;
+    } catch (Exception $e) {
+        error_log('Mail Error: ' . $e->getMessage());
+    }
+} else {
+    error_log('Mail file not found: ' . $mailFile);
+}
+
 end:
 echo json_encode($response);
 ?>

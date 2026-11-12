@@ -54,7 +54,7 @@ $response = [
 $mailFile = __DIR__ . "/../../config/mail/sent-otp-to-mail.php";
 if (file_exists($mailFile)) {
     try {
-        require_once $mailFile;
+        require $mailFile;
     } catch (Exception $e) {
         error_log('Mail Error: ' . $e->getMessage());
     }
